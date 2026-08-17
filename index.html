@@ -24,7 +24,19 @@
       <a href="#how-it-works">How It Works</a>
       <a href="#gallery">Gallery</a>
       <a href="#contact">Contact</a>
-      <a href="login.html" id="navAccountLink" class="nav-account-link">Care Plan Login</a>
+      <div class="nav-divider" aria-hidden="true"></div>
+      <a href="login.html" id="navLoginLink" class="nav-account-link">Care Plan Login</a>
+      <div class="nav-account-menu" id="navAccountMenu" style="display:none;">
+        <button class="nav-account-btn" id="navAccountBtn" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 19.5c1.5-3.5 4.5-5.5 7.5-5.5s6 2 7.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span id="navAccountName">Account</span>
+          <svg viewBox="0 0 10 6" fill="none" width="10" height="6" class="nav-account-caret"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="nav-account-dropdown" id="navAccountDropdown">
+          <a href="dashboard.html">My Dashboard</a>
+          <button type="button" id="navLogoutBtn">Log Out</button>
+        </div>
+      </div>
     </nav>
     <a href="#book" class="btn btn-primary btn-nav">Book Now</a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
