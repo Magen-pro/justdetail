@@ -30,14 +30,52 @@ document.addEventListener('DOMContentLoaded', () => {
     waLink.href = `https://wa.me/${OWNER_WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi, I\'d like to know more about Just Detail services.')}`;
   }
 
-  // Show "My Dashboard" instead of "Log In" if the visitor already has a session
-  const navAccountLink = document.getElementById('navAccountLink');
-  if (navAccountLink && typeof supabaseClient !== 'undefined') {
-    supabaseClient.auth.getUser().then(({ data }) => {
+  // Toggle between plain "Care Plan Login" link and account dropdown
+  // depending on whether the visitor has an active session.
+  const navLoginLink = document.getElementById('navLoginLink');
+  const navAccountMenu = document.getElementById('navAccountMenu');
+  const navAccountBtn = document.getElementById('navAccountBtn');
+  const navAccountDropdown = document.getElementById('navAccountDropdown');
+  const navAccountName = document.getElementById('navAccountName');
+  const navLogoutBtn = document.getElementById('navLogoutBtn');
+
+  if (navLoginLink && navAccountMenu && typeof supabaseClient !== 'undefined') {
+    supabaseClient.auth.getUser().then(async ({ data }) => {
       if (data && data.user) {
-        navAccountLink.textContent = 'My Dashboard';
-        navAccountLink.href = 'dashboard.html';
+        navLoginLink.style.display = 'none';
+        navAccountMenu.style.display = 'block';
+
+        // Try to show the client's first name instead of a generic "Account"
+        const { data: clientRow } = await supabaseClient
+          .from('clients')
+          .select('full_name')
+          .eq('id', data.user.id)
+          .maybeSingle();
+        if (clientRow && clientRow.full_name) {
+          navAccountName.textContent = clientRow.full_name.split(' ')[0];
+        }
       }
+    });
+  }
+
+  if (navAccountBtn && navAccountDropdown) {
+    navAccountBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = navAccountDropdown.classList.toggle('open');
+      navAccountBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+    document.addEventListener('click', () => {
+      navAccountDropdown.classList.remove('open');
+      navAccountBtn.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  if (navLogoutBtn) {
+    navLogoutBtn.addEventListener('click', async () => {
+      if (typeof supabaseClient !== 'undefined') {
+        await supabaseClient.auth.signOut();
+      }
+      window.location.reload();
     });
   }
 });
