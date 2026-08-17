@@ -161,3 +161,54 @@
   margin-bottom: 20px;
 }
 .visit-modal-header h3 { font-size: 1.2rem; }
+
+/* Client-side booking history within a subscription card */
+.sub-bookings {
+  border-top: 1px solid rgba(13,13,13,0.08);
+  padding-top: 14px;
+  margin-top: 4px;
+}
+.sub-bookings-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #8a8a8d;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 10px;
+}
+.sub-booking-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid rgba(13,13,13,0.05);
+}
+.sub-booking-row:first-of-type { border-top: none; }
+.sub-booking-info { display: flex; flex-direction: column; }
+.sub-booking-date { font-size: 0.86rem; font-weight: 600; }
+.sub-booking-time { font-size: 0.76rem; color: #8a8a8d; }
+
+.booking-status {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.booking-status-pending { background: rgba(184,140,20,0.12); color: #9c6f00; }
+.booking-status-confirmed { background: rgba(46,163,89,0.12); color: #1f7a3d; }
+.booking-status-rescheduled_by_admin { background: rgba(184,140,20,0.12); color: #9c6f00; }
+.booking-status-completed { background: rgba(13,13,13,0.08); color: #55575c; }
+.booking-status-cancelled { background: rgba(227,30,36,0.1); color: var(--red-dark); }
+
+.sub-booking-note {
+  font-size: 0.78rem;
+  color: #6b6c70;
+  background: var(--ivory);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  margin: 4px 0 8px;
+}
