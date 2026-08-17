@@ -114,7 +114,7 @@ async function showEnrollPanel(planId) {
 async function loadSubscriptions() {
   const { data, error } = await supabaseClient
     .from('subscriptions')
-    .select('*, plans(*)')
+    .select('*, plans(*), bookings(*)')
     .eq('client_id', currentUser.id)
     .order('created_at', { ascending: false });
 
@@ -154,6 +154,7 @@ function renderSubscriptions() {
     const status = statusLabel(sub.status);
     const segmentLabel = sub.vehicle_segment === 'suv' ? 'SUV / MPV / Large SUV' : 'Sedan / Hatch / Compact SUV';
     const canBookVisit = sub.status === 'active' && sub.washes_remaining > 0;
+    const bookings = (sub.bookings || []).slice().sort((a, b) => new Date(b.requested_date) - new Date(a.requested_date));
 
     return `
       <div class="sub-card">
@@ -185,9 +186,41 @@ function renderSubscriptions() {
         `}
 
         ${canBookVisit ? `<button class="btn btn-primary btn-block" onclick="openVisitModal('${sub.id}')">Request next visit</button>` : ''}
+
+        ${bookings.length > 0 ? `
+          <div class="sub-bookings">
+            <p class="sub-bookings-label">Your visit requests</p>
+            ${bookings.map(b => `
+              <div class="sub-booking-row">
+                <div class="sub-booking-info">
+                  <span class="sub-booking-date">${formatVisitDate(b.confirmed_date || b.requested_date)}</span>
+                  <span class="sub-booking-time">${b.confirmed_time || b.requested_time || ''}</span>
+                </div>
+                <span class="booking-status booking-status-${b.status}">${bookingStatusLabel(b.status)}</span>
+              </div>
+              ${(b.status === 'rescheduled_by_admin' || b.status === 'cancelled') && b.admin_note ? `<p class="sub-booking-note">${b.admin_note}</p>` : ''}
+            `).join('')}
+          </div>
+        ` : ''}
       </div>
     `;
   }).join('');
+}
+
+function bookingStatusLabel(status) {
+  const map = {
+    pending: 'Pending confirmation',
+    confirmed: 'Confirmed',
+    rescheduled_by_admin: 'Reschedule proposed',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+  };
+  return map[status] || status;
+}
+
+function formatVisitDate(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // ---------------- Visit request modal ----------------
@@ -243,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     closeVisitModal();
+    await loadSubscriptions();
     alert('Visit requested! We\'ll confirm your slot shortly.');
   });
 });
