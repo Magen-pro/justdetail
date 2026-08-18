@@ -1311,3 +1311,106 @@ h1, h2, h3, h4 {
 @media (min-width: 860px) {
   .gallery { padding: 100px 0; }
 }
+
+/* =========================================================
+   Nav account dropdown
+   ========================================================= */
+.nav-account-menu {
+  position: relative;
+}
+.nav-account-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--red);
+  cursor: pointer;
+  padding: 4px 0;
+}
+.nav-account-caret {
+  transition: transform 0.25s var(--ease);
+  color: #9c9ca0;
+}
+.nav-account-btn[aria-expanded="true"] .nav-account-caret { transform: rotate(180deg); }
+
+.nav-account-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 180px;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(13,13,13,0.1);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+  padding: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease), visibility 0.2s;
+  z-index: 50;
+}
+.nav-account-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.nav-account-dropdown a,
+.nav-account-dropdown button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 11px 12px;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--black);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background 0.15s var(--ease);
+}
+.nav-account-dropdown a:hover,
+.nav-account-dropdown button:hover { background: var(--ivory); }
+.nav-account-dropdown button { color: var(--red); }
+
+.nav-divider {
+  display: none;
+}
+
+@media (max-width: 859px) {
+  .nav-divider {
+    display: block;
+    height: 1px;
+    background: rgba(13,13,13,0.1);
+    margin: 4px 0;
+  }
+
+  /* Flatten the account menu into plain stacked links — no dropdown toggle on mobile */
+  .nav-account-menu { width: 100%; }
+  .nav-account-btn { display: none; }
+  .nav-account-dropdown {
+    position: static;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .nav-account-dropdown a,
+  .nav-account-dropdown button {
+    padding: 10px 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+  .nav-account-dropdown a:hover,
+  .nav-account-dropdown button:hover { background: none; }
+}
