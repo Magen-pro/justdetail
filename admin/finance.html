@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finances — Admin — Just Detail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/finances.css">
+</head>
+<body>
+
+<div class="admin-shell" id="adminShell">
+  <main class="admin-main">
+    <div id="pageLoading" class="admin-loading">Loading finances…</div>
+
+    <div id="pageContent" style="display:none;">
+      <div class="admin-page-header admin-page-header-row">
+        <div>
+          <h1>Finances</h1>
+          <p>How much you've received, spent, and made.</p>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-outline" id="openAddExpense">+ Add Expense</button>
+          <button class="btn btn-primary" id="openRecordPayment">+ Record Payment</button>
+        </div>
+      </div>
+
+      <!-- Today / This Month summary -->
+      <div class="finance-summary-grid">
+        <div class="finance-summary-card">
+          <div class="finance-summary-label">Today</div>
+          <div class="finance-summary-row">
+            <div><span class="finance-summary-num" id="todayRevenue">₹0</span><span class="finance-summary-sub">Revenue</span></div>
+            <div><span class="finance-summary-num finance-num-expense" id="todayExpenses">₹0</span><span class="finance-summary-sub">Expenses</span></div>
+            <div><span class="finance-summary-num finance-num-profit" id="todayProfit">₹0</span><span class="finance-summary-sub">Profit</span></div>
+          </div>
+        </div>
+        <div class="finance-summary-card">
+          <div class="finance-summary-label">This Month</div>
+          <div class="finance-summary-row">
+            <div><span class="finance-summary-num" id="monthRevenue">₹0</span><span class="finance-summary-sub">Revenue</span></div>
+            <div><span class="finance-summary-num finance-num-expense" id="monthExpenses">₹0</span><span class="finance-summary-sub">Expenses</span></div>
+            <div><span class="finance-summary-num finance-num-profit" id="monthProfit">₹0</span><span class="finance-summary-sub">Profit</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Date range filter for the lists below -->
+      <div class="admin-panel">
+        <div class="admin-panel-header">
+          <h2>Filter</h2>
+          <div class="admin-filters" id="rangeFilters">
+            <button class="filter-chip active" data-range="today">Today</button>
+            <button class="filter-chip" data-range="week">This Week</button>
+            <button class="filter-chip" data-range="month">This Month</button>
+            <button class="filter-chip" data-range="custom">Custom</button>
+          </div>
+        </div>
+        <div class="admin-form-section" id="customRangeRow" style="display:none;">
+          <div class="btn-row" style="align-items:flex-end;">
+            <div class="admin-form-row" style="margin-bottom:0;">
+              <label for="customFrom">From</label>
+              <input type="date" id="customFrom">
+            </div>
+            <div class="admin-form-row" style="margin-bottom:0;">
+              <label for="customTo">To</label>
+              <input type="date" id="customTo">
+            </div>
+            <button class="btn btn-primary btn-sm" id="applyCustomRange">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="finance-range-total">
+        <span>Selected range:</span>
+        <strong id="rangeRevenue">₹0 revenue</strong>
+        <strong class="finance-num-expense" id="rangeExpenses">₹0 expenses</strong>
+        <strong class="finance-num-profit" id="rangeProfit">₹0 profit</strong>
+      </div>
+
+      <!-- Revenue: one-time bookings -->
+      <div class="admin-panel">
+        <div class="admin-panel-header"><h2>Revenue — One-Time Bookings</h2></div>
+        <div class="admin-panel-body">
+          <div class="admin-table-wrap">
+            <table class="admin-table" id="oneTimeRevenueTable">
+              <thead><tr><th>Customer</th><th>Service</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="oneTimeRevenueBody"></tbody>
+            </table>
+          </div>
+          <div id="oneTimeRevenueEmpty" class="admin-panel-empty" style="display:none;">No payments recorded for this range.</div>
+        </div>
+      </div>
+
+      <!-- Revenue: maintenance plans -->
+      <div class="admin-panel">
+        <div class="admin-panel-header"><h2>Revenue — Maintenance Plans</h2></div>
+        <div class="admin-panel-body">
+          <div class="admin-table-wrap">
+            <table class="admin-table" id="maintenanceRevenueTable">
+              <thead><tr><th>Customer</th><th>Plan</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="maintenanceRevenueBody"></tbody>
+            </table>
+          </div>
+          <div id="maintenanceRevenueEmpty" class="admin-panel-empty" style="display:none;">No payments recorded for this range.</div>
+        </div>
+      </div>
+
+      <!-- Expenses -->
+      <div class="admin-panel">
+        <div class="admin-panel-header"><h2>Expenses</h2></div>
+        <div class="admin-panel-body">
+          <div class="admin-table-wrap">
+            <table class="admin-table" id="expensesTable">
+              <thead><tr><th>Category</th><th>Amount</th><th>Date</th><th>Description</th><th></th></tr></thead>
+              <tbody id="expensesBody"></tbody>
+            </table>
+          </div>
+          <div id="expensesEmpty" class="admin-panel-empty" style="display:none;">No expenses recorded for this range.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- RECORD PAYMENT MODAL -->
+<div class="fin-modal-overlay" id="paymentModalOverlay">
+  <div class="fin-modal">
+    <div class="fin-modal-header">
+      <h3>Record Payment</h3>
+      <button class="modal-close" id="paymentModalClose">&times;</button>
+    </div>
+    <form id="paymentForm" class="fin-modal-body">
+      <div class="admin-form-row">
+        <label for="paySource">What is this payment for? <span class="req">*</span></label>
+        <select id="paySource" required>
+          <option value="" disabled selected>Select type</option>
+          <option value="one_time">One-time booking</option>
+          <option value="subscription">Maintenance plan</option>
+        </select>
+      </div>
+
+      <div class="admin-form-row" id="payOneTimeRow" style="display:none;">
+        <label for="payOneTimeBooking">Select booking <span class="req">*</span></label>
+        <select id="payOneTimeBooking"></select>
+      </div>
+
+      <div class="admin-form-row" id="paySubscriptionRow" style="display:none;">
+        <label for="paySubscription">Select customer / plan <span class="req">*</span></label>
+        <select id="paySubscription"></select>
+      </div>
+
+      <div class="admin-form-row">
+        <label for="payAmount">Amount (₹) <span class="req">*</span></label>
+        <input type="number" id="payAmount" min="1" step="1" required>
+        <p id="payAmountHint" class="field-hint"></p>
+      </div>
+      <div class="admin-form-row">
+        <label for="payMethod">Payment Method <span class="req">*</span></label>
+        <select id="payMethod" required>
+          <option value="" disabled selected>Select method</option>
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="admin-form-row">
+        <label for="payStatus">Payment Status <span class="req">*</span></label>
+        <select id="payStatus" required>
+          <option value="paid">Paid (full amount)</option>
+          <option value="partially_paid">Partially Paid</option>
+        </select>
+      </div>
+      <div class="admin-form-row">
+        <label for="payDate">Payment Date <span class="req">*</span></label>
+        <input type="date" id="payDate" required>
+      </div>
+      <div class="admin-form-row">
+        <label for="payNotes">Notes</label>
+        <textarea id="payNotes" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" id="paySubmit">Record Payment</button>
+    </form>
+  </div>
+</div>
+
+<!-- ADD EXPENSE MODAL -->
+<div class="fin-modal-overlay" id="expenseModalOverlay">
+  <div class="fin-modal">
+    <div class="fin-modal-header">
+      <h3>Add Expense</h3>
+      <button class="modal-close" id="expenseModalClose">&times;</button>
+    </div>
+    <form id="expenseForm" class="fin-modal-body">
+      <div class="admin-form-row">
+        <label for="expCategory">Category <span class="req">*</span></label>
+        <select id="expCategory" required>
+          <option value="" disabled selected>Select category</option>
+          <option value="fuel">Fuel</option>
+          <option value="cleaning_products">Cleaning Products</option>
+          <option value="equipment">Equipment</option>
+          <option value="equipment_repair">Equipment Repair</option>
+          <option value="marketing">Marketing</option>
+          <option value="staff">Staff</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="admin-form-row">
+        <label for="expAmount">Amount (₹) <span class="req">*</span></label>
+        <input type="number" id="expAmount" min="1" step="1" required>
+      </div>
+      <div class="admin-form-row">
+        <label for="expDate">Date <span class="req">*</span></label>
+        <input type="date" id="expDate" required>
+      </div>
+      <div class="admin-form-row">
+        <label for="expDescription">Description</label>
+        <textarea id="expDescription" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" id="expSubmit">Add Expense</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="js/admin-auth.js"></script>
+<script src="js/admin-common.js"></script>
+<script src="js/finances-admin.js"></script>
+</body>
+</html>
